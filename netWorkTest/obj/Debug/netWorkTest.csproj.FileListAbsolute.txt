@@ -1,0 +1,8 @@
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.Properties.Resources.resources
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.csproj.GenerateResource.Cache
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\bin\Debug\netWorkTest.exe.config
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\bin\Debug\netWorkTest.exe
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\bin\Debug\netWorkTest.pdb
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.exe
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.pdb
+C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.csprojResolveAssemblyReference.cache
