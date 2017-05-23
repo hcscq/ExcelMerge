@@ -17,3 +17,12 @@ C:\Users\39438\Desktop\WindowsFormsApplication1\WindowsFormsApplication1\obj\Deb
 C:\Users\39438\Desktop\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.ExcelMerge.resources
 C:\Users\39438\Desktop\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
 C:\Users\39438\Desktop\WindowsFormsApplication1\WindowsFormsApplication1\obj\Debug\ExcelMerge.csproj.GenerateResource.Cache
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\bin\Debug\WindowsFormsApplication1.exe.config
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.csproj.ResolveComReference.cache
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\obj\Debug\WindowsFormsApplication1.exe
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\obj\Debug\WindowsFormsApplication1.pdb
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\bin\Debug\WindowsFormsApplication1.exe
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\bin\Debug\WindowsFormsApplication1.pdb
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\obj\Debug\WindowsFormsApplication1.ExcelMerge.resources
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.csproj.GenerateResource.Cache
