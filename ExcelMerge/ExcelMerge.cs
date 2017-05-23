@@ -48,11 +48,14 @@ namespace WindowsFormsApplication1
         {
             DataTable mainDt = ExcelHelper.ExecuteDataTable(Con_MainExcel, "select * from [Sheet1$]", null);
             bool retry = false;
-            foreach (var fn in ChildrenFilesName) {
+            string fn = "";
+            for (int m = 0; m < ChildrenFilesName.Count; m++)
+            {
                 ChildSheetName.Clear();
                 try
                 {
-                    if(!retry)
+                    fn = ChildrenFilesName[m];
+                    if (!retry)
                         Con_CurChildExcel = ExcelHelper.CreateConnection(fn, ExcelHelper.ExcelVerion.Excel2003);
                     Con_CurChildExcel.Open();
                     foreach (DataRow drt in Con_CurChildExcel.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[] { null, null, null, "Table" }).Rows)
@@ -62,8 +65,9 @@ namespace WindowsFormsApplication1
                     DataRow dr;
                     foreach (var it in ChildSheetName)
                     {
-                        if (it.Contains("_")) {
-                            MessageBox.Show("检查文件"+ fn+"\r\n是否启用了筛选功能.目前将跳过该文件的工作簿:"+it+".稍后请自行检查该部分数据内容的准确性.");
+                        if (it.Contains("_"))
+                        {
+                            MessageBox.Show("检查文件" + fn + "\r\n是否启用了筛选功能.目前将跳过该文件的工作簿:" + it + ".稍后请自行检查该部分数据内容的准确性.");
                             continue;
                         }
                         dt = ExcelHelper.ExecuteDataTable(Con_CurChildExcel, @"select * from [" + it + "] ", null);
@@ -75,13 +79,13 @@ namespace WindowsFormsApplication1
                                 dr = mainDt.NewRow();
                                 dr["商务代表"] = dt.Rows[0]["F2"];
                                 dr["上级经理"] = dt.Rows[0]["F4"];
-                                dr["医院名称"] = dt.Rows[i]["F4"];
-                                dr["医生姓名"] = dt.Rows[i]["F3"];
-                                dr["科室"] = dt.Rows[i]["F5"];
-                                dr["客户性质"] = dt.Rows[i]["F6"];
-                                dr["当日情况反馈"] = dt.Rows[i]["F7"];
-                                dr["计划"] = dt.Rows[i]["F8"];
-                                dr["省区意见"] = dt.Rows[i]["F9"];
+                                dr["医院名称"] = dt.Rows[i]["F4"] == null ? " " : dt.Rows[i]["F4"];
+                                dr["医生姓名"] = dt.Rows[i]["F3"] == null ? " " : dt.Rows[i]["F3"];
+                                dr["科室"] = dt.Rows[i]["F5"] == null ? " " : dt.Rows[i]["F5"];
+                                dr["客户性质"] = dt.Rows[i]["F6"] == null ? " " : dt.Rows[i]["F6"];
+                                dr["当日情况反馈"] = dt.Rows[i]["F7"] == null ? " " : dt.Rows[i]["F7"];
+                                dr["计划"] = dt.Rows[i]["F8"] == null ? " " : dt.Rows[i]["F8"];
+                                dr["省区意见"] = dt.Rows[i]["F9"] == null ? " " : dt.Rows[i]["F9"];
                                 mainDt.Rows.Add(dr);
                                 //sssss = GetInsertStr(dr);
                                 ExcelHelper.ExecuteNonQuery(Con_MainExcel, GetInsertStr(dr), null);
@@ -95,6 +99,7 @@ namespace WindowsFormsApplication1
                     if (e1.Message.Contains("预期的格式") && !retry)
                     {
                         retry = true;
+                        m--;
                         Con_CurChildExcel = ExcelHelper.CreateConnection(fn, ExcelHelper.ExcelVerion.Excel2007);
                     }
                     else
