@@ -10,7 +10,6 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-/ExcelMerge/bin/Debug
 
 # Windows Installer files
 *.cab
