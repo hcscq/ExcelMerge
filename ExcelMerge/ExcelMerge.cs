@@ -74,16 +74,18 @@ namespace WindowsFormsApplication1
                         if (dt.Rows.Count > 2)
                             for (int i = 2; i < dt.Rows.Count; i++)
                             {
-                                if (dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString()))
+                                if ((dt.Rows[i]["F4"] == null||string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString())) && (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
+                                    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) && 
+                                    (dt.Rows[i]["F6"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F6"].ToString())) && (dt.Rows[i]["F7"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F7"].ToString())))
                                     continue;
                                 dr = mainDt.NewRow();
                                 dr["商务代表"] = dt.Rows[0]["F2"];
                                 dr["上级经理"] = dt.Rows[0]["F4"];
-                                dr["医院名称"] = dt.Rows[i]["F4"] == null ? " " : dt.Rows[i]["F4"];
-                                dr["医生姓名"] = dt.Rows[i]["F3"] == null ? " " : dt.Rows[i]["F3"];
-                                dr["科室"] = dt.Rows[i]["F5"] == null ? " " : dt.Rows[i]["F5"];
-                                dr["客户性质"] = dt.Rows[i]["F6"] == null ? " " : dt.Rows[i]["F6"];
-                                dr["当日情况反馈"] = dt.Rows[i]["F7"] == null ? " " : dt.Rows[i]["F7"];
+                                dr["医院名称"] = dt.Rows[i]["F4"] == null ? "未填写" : dt.Rows[i]["F4"];
+                                dr["医生姓名"] = dt.Rows[i]["F3"] == null ? "未填写" : dt.Rows[i]["F3"];
+                                dr["科室"] = dt.Rows[i]["F5"] == null ? "未填写" : dt.Rows[i]["F5"];
+                                dr["客户性质"] = dt.Rows[i]["F6"] == null ? "未填写" : dt.Rows[i]["F6"];
+                                dr["当日情况反馈"] = dt.Rows[i]["F7"] == null ? "未填写" : dt.Rows[i]["F7"];
                                 dr["计划"] = dt.Rows[i]["F8"] == null ? " " : dt.Rows[i]["F8"];
                                 dr["省区意见"] = dt.Rows[i]["F9"] == null ? " " : dt.Rows[i]["F9"];
                                 mainDt.Rows.Add(dr);
