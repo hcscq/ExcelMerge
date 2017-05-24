@@ -10,7 +10,9 @@ using System.Windows.Forms;
 using Utils;
 using System.Data.OleDb;
 using System.IO;
-namespace WindowsFormsApplication1
+using ExcelMerge.Common;
+
+namespace ExcelMerge
 {
     public partial class ExcelMerge : Form
     {
@@ -21,6 +23,35 @@ namespace WindowsFormsApplication1
         private OleDbConnection Con_CurChildExcel = null;
         private List<string> ChildSheetName = new List<string>();
         private List<string> ChildrenFilesName = new List<string>();
+        private List<sheetInfo> ListSheetInfo = new List<sheetInfo>();
+        public enum OperRe{ALLRIGHT,SKIPED,PART }
+
+        public struct sheetInfo
+        {
+            public string fileName;
+            public string sheetName;
+            public OperRe operRe;
+            public int dealCount;
+            public override string ToString()
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(" FileName:").Append(fileName);
+                sb.Append(" SheetName:").Append(sheetName);
+                sb.Append(" DealCount:").Append(dealCount);
+                sb.Append(" OperRe:");
+                switch (operRe)
+                {
+                    case OperRe.ALLRIGHT:
+                        sb.Append("全部顺利执行.");break;
+                    case OperRe.PART:
+                        sb.Append("部分执行.");break;
+                    case OperRe.SKIPED:
+                        sb.Append("被跳过.");break;
+                    default:break;
+                }
+                return sb.ToString();
+            }
+        }
         public ExcelMerge()
         {
             InitializeComponent();
@@ -46,9 +77,12 @@ namespace WindowsFormsApplication1
         }
         public void MergeExcel()
         {
+            Logger.WriteHeader();
+            ListSheetInfo.Clear();
             DataTable mainDt = ExcelHelper.ExecuteDataTable(Con_MainExcel, "select * from [Sheet1$]", null);
             bool retry = false;
             string fn = "";
+            sheetInfo loc_info;
             for (int m = 0; m < ChildrenFilesName.Count; m++)
             {
                 ChildSheetName.Clear();
@@ -65,17 +99,24 @@ namespace WindowsFormsApplication1
                     DataRow dr;
                     foreach (var it in ChildSheetName)
                     {
+                        loc_info = new sheetInfo();
+                        loc_info.fileName = fn;
+                        loc_info.sheetName = it;
+                        if (ListSheetInfo.Exists(item => item.fileName == loc_info.fileName && item.sheetName == loc_info.sheetName))
+                            continue;
                         if (it.Contains("_"))
                         {
                             MessageBox.Show("检查文件" + fn + "\r\n是否启用了筛选功能.目前将跳过该文件的工作簿:" + it + ".稍后请自行检查该部分数据内容的准确性.");
+                            loc_info.operRe = OperRe.SKIPED;
+                            ListSheetInfo.Add(loc_info);
                             continue;
                         }
                         dt = ExcelHelper.ExecuteDataTable(Con_CurChildExcel, @"select * from [" + it + "] ", null);
                         if (dt.Rows.Count > 2)
                             for (int i = 2; i < dt.Rows.Count; i++)
                             {
-                                if ((dt.Rows[i]["F4"] == null||string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString())) && (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
-                                    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) && 
+                                if ((dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString())) && (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
+                                    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) &&
                                     (dt.Rows[i]["F6"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F6"].ToString())) && (dt.Rows[i]["F7"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F7"].ToString())))
                                     continue;
                                 dr = mainDt.NewRow();
@@ -90,8 +131,11 @@ namespace WindowsFormsApplication1
                                 dr["省区意见"] = dt.Rows[i]["F9"] == null ? " " : dt.Rows[i]["F9"];
                                 mainDt.Rows.Add(dr);
                                 //sssss = GetInsertStr(dr);
-                                ExcelHelper.ExecuteNonQuery(Con_MainExcel, GetInsertStr(dr), null);
+                                if (0 < ExcelHelper.ExecuteNonQuery(Con_MainExcel, GetInsertStr(dr), null))
+                                    loc_info.dealCount++;
                             }
+                        loc_info.operRe = OperRe.ALLRIGHT;
+                        ListSheetInfo.Add(loc_info);
                     }
                     retry = false;
                 }
@@ -107,10 +151,13 @@ namespace WindowsFormsApplication1
                     else
                     {
                         retry = false;
-                        MessageBox.Show("文件" + fn + "处理出现问题.截图发给..李大爷\r\n" + e1.Message);
+                        MessageBox.Show("文件" + fn + "处理出现问题.截图发给..\r\n" + e1.Message);
                     }
                 }
             }
+            foreach (var it in ListSheetInfo)
+                Logger.WriteLog(it.ToString()+"\r\n");
+            Logger.WriteTail();
             return;
         }
         private string GetInsertStr(DataRow dr, string tableName = " [Sheet1$] ")

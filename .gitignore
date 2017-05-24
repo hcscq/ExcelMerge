@@ -5,17 +5,22 @@ ehthumbs.db
 *.xlsx
 
 
+
 # Folder config file
 Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+obj/
 
 # Windows Installer files
 *.cab
 *.msi
 *.msm
 *.msp
+*.pdb
+*.exe
+*.cache
 
 # Windows shortcuts
 *.lnk
@@ -48,3 +53,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.exe
+ExcelMerge/bin/Debug/WindowsFormsApplication1.pdb
+*.exe
