@@ -10,14 +10,17 @@ namespace ExcelMerge.Common
 {
     public static class Logger
     {
-        private static string path = Application.StartupPath + @"\Log\" + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
+        private static string path = Application.StartupPath + @"\Log\" ;
+        private static string fullName = path + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
         public static void WriteLog(string log, bool insertTime = true)
         {
-            if (!File.Exists(path))
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            if (!File.Exists(fullName))
             {
-                File.Create(path);
+                File.Create(fullName).Close();
             }
-            using (FileStream fs = new FileStream(path, FileMode.Append))
+            using (FileStream fs = new FileStream(fullName, FileMode.Append))
             {
                 using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.GetEncoding("gb2312")))
                 {

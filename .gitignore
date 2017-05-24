@@ -12,6 +12,8 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 obj/
+debug/
+*.cache
 
 # Windows Installer files
 *.cab
@@ -20,7 +22,7 @@ obj/
 *.msp
 *.pdb
 *.exe
-*.cache
+
 
 # Windows shortcuts
 *.lnk
