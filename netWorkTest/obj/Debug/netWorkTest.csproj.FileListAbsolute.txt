@@ -5,4 +5,3 @@ C:\Users\39438\Documents\GitHub\mir2\netWorkTest\bin\Debug\netWorkTest.exe
 C:\Users\39438\Documents\GitHub\mir2\netWorkTest\bin\Debug\netWorkTest.pdb
 C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.exe
 C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.pdb
-C:\Users\39438\Documents\GitHub\mir2\netWorkTest\obj\Debug\netWorkTest.csprojResolveAssemblyReference.cache

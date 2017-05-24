@@ -94,12 +94,23 @@ namespace netWorkTest.MirNetwork
                 return;
             }
             //byte[] rawBytes =SocketArgs.Buffer;
-            byte[] temp = _rawData;
-            _rawData = new byte[(3*SocketArgs.BytesTransferred-2)/4 + temp.Length];
-            Buffer.BlockCopy(temp, 0, _rawData, 0, temp.Length);
-            EnDecode.fnDecode6BitBufA(SocketArgs.Buffer, _rawData, temp.Length, _rawData.Length);
+            //*pszNext++ = '#';
 
-            //Buffer.BlockCopy(rawBytes, 0, _rawData, temp.Length, SocketArgs.BytesTransferred);
+            //memmove(pszNext, pszPacket, nLen);
+
+            //pszNext += nLen;
+
+            //*pszNext++ = '!';
+            //*pszNext++ = '$';
+            //*pszNext++ = '\0';
+
+
+            byte[] temp = _rawData;
+            _rawData = new byte[SocketArgs.BytesTransferred+ temp.Length];
+            Buffer.BlockCopy(temp, 0, _rawData, 0, temp.Length);
+            //EnDecode.fnDecode6BitBufA(SocketArgs.Buffer, _rawData, temp.Length, _rawData.Length);
+
+            Buffer.BlockCopy(SocketArgs.Buffer, 0, _rawData, temp.Length, SocketArgs.BytesTransferred);
 
             _sendList.Enqueue(new C.KeepAlive
             {
@@ -107,7 +118,7 @@ namespace netWorkTest.MirNetwork
             });
 
             Packet p;
-            while ((p = Packet.ReceivePacket(_rawData, out _rawData)) != null)
+            while ((p = Packet.ReceivePacketEx(_rawData, out _rawData)) != null)
                 _receiveList.Enqueue(p);
             //Process();
             //BeginReceive();
@@ -153,16 +164,26 @@ namespace netWorkTest.MirNetwork
                 while (_sendList.Count > 0)
                 {
                     Packet p = _sendList.Dequeue();
-                    data.AddRange(p.GetPacketBytes());
+                    data.AddRange(p.GetPacketBytesEx());
                 }
                 //outByte = new byte[data.Count + ((2 + data.Count) / 3)];
 
                 lock (SendSocketArgs)
                 {
+                    //*pszNext++ = '#';
+
+                    //memmove(pszNext, pszPacket, nLen);
+
+                    //pszNext += nLen;
+
+                    //*pszNext++ = '!';
+                    //*pszNext++ = '$';
+                    //*pszNext++ = '\0';
                     //EnDecode.fnEncode6BitBufA(data.ToArray(), SendSocketArgs.Buffer);
-                    //Buffer.BlockCopy(data.ToArray(), 0, SendSocketArgs.Buffer,0, data.Count);
-                    SendSocketArgs.SetBuffer(SendSocketArgs.Offset, EnDecode.fnEncode6BitBufA(data.ToArray(), SendSocketArgs.Buffer));
+                    Buffer.BlockCopy(data.ToArray(), 0, SendSocketArgs.Buffer,0, data.Count);
+                    SendSocketArgs.SetBuffer(SendSocketArgs.Offset,data.Count);
                 }
+
                 if (!_client.SendAsync(SendSocketArgs))
                     NetWork.ProcessSend(SendSocketArgs);
             }

@@ -64,6 +64,7 @@
     <Compile Include="MirNetwork\EnDecode.cs" />
     <Compile Include="MirNetwork\Envir.cs" />
     <Compile Include="MirNetwork\MirConnectionSimply.cs" />
+    <Compile Include="MirNetwork\MsgIdDef.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />

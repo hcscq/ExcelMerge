@@ -22,10 +22,13 @@ namespace netWorkTest
         public NetWork()
         {
             InitializeComponent();
+            this.Disposed += new EventHandler(OnClose);
             InitialClientNetWork();
+            Packet.IsServer = false;
             //InitialServerNetwork();
         }
-
+        private void OnClose(object sender,EventArgs e)
+        { Running = false; }
         private void InitialServerNetwork()
         {
             Envir.Connections.Clear();
