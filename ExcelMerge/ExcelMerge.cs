@@ -24,7 +24,7 @@ namespace ExcelMerge
         private List<string> ChildSheetName = new List<string>();
         private List<string> ChildrenFilesName = new List<string>();
         private List<sheetInfo> ListSheetInfo = new List<sheetInfo>();
-        public enum OperRe{ALLRIGHT,SKIPED,PART }
+        public enum OperRe{ALLRIGHT,SKIPED,PART,ERROR,RETRY }
 
         public struct sheetInfo
         {
@@ -47,6 +47,10 @@ namespace ExcelMerge
                         sb.Append("部分执行.");break;
                     case OperRe.SKIPED:
                         sb.Append("被跳过.");break;
+                    case OperRe.ERROR:
+                        sb.Append("出错并跳过."); break;
+                    case OperRe.RETRY:
+                        sb.Append("出错，立即重试."); break;
                     default:break;
                 }
                 return sb.ToString();
@@ -82,7 +86,7 @@ namespace ExcelMerge
             DataTable mainDt = ExcelHelper.ExecuteDataTable(Con_MainExcel, "select * from [Sheet1$]", null);
             bool retry = false;
             string fn = "";
-            sheetInfo loc_info;
+            sheetInfo loc_info=new sheetInfo ();
             for (int m = 0; m < ChildrenFilesName.Count; m++)
             {
                 ChildSheetName.Clear();
@@ -141,7 +145,7 @@ namespace ExcelMerge
                 }
                 catch (Exception e1)
                 {
-                    Logger.WriteLog(e1.Message + "\r\n");
+                    //Logger.WriteLog(e1.Message + "\r\n");
                     //预期的格式
                     if (e1.Message.Contains("预期的格式") && !retry)
                     {
@@ -151,6 +155,8 @@ namespace ExcelMerge
                     }
                     else
                     {
+                        loc_info.operRe = OperRe.ERROR;
+                        Logger.WriteLog(loc_info.ToString() + e1.Message + "\r\n");
                         retry = false;
                         MessageBox.Show("文件" + fn + "处理出现问题.截图发给..\r\n" + e1.Message);
                     }

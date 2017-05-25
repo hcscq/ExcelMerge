@@ -11,7 +11,7 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-obj/
+obj/debug/
 debug/
 
 # Windows Installer files
@@ -57,3 +57,6 @@ Temporary Items
 *.exe
 ExcelMerge/bin/Debug/WindowsFormsApplication1.pdb
 *.exe
+*.Cache
+ExcelMerge/obj/Debug/ExcelMerge.csproj.GenerateResource.Cache
+*.Cache
