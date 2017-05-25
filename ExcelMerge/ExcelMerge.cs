@@ -141,6 +141,7 @@ namespace ExcelMerge
                 }
                 catch (Exception e1)
                 {
+                    Logger.WriteLog(e1.Message + "\r\n");
                     //预期的格式
                     if (e1.Message.Contains("预期的格式") && !retry)
                     {

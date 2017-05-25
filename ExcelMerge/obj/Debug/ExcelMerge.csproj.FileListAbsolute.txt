@@ -27,3 +27,12 @@ C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.Excel
 C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.Properties.Resources.resources
 C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.exe
 C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.pdb
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\bin\Debug\ExcelMerge.exe.config
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.csproj.ResolveComReference.cache
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\bin\Debug\ExcelMerge.exe
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\bin\Debug\ExcelMerge.pdb
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.ExcelMerge.resources
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.Properties.Resources.resources
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.csproj.GenerateResource.Cache
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.exe
+E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.pdb
