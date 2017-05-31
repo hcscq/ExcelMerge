@@ -4446,11 +4446,12 @@ public abstract class Packet
         {
             try
             {
+                reader.ReadInt32();
+
                 short id = reader.ReadInt16();
 
                 p = IsServer ? GetClientPacket(id) : GetServerPacket(id);
                 if (p == null) return null;
-
                 p.ReadPacket(reader);
             }
             catch

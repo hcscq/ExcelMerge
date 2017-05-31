@@ -125,13 +125,14 @@ namespace ClientPackets
 
         protected override void ReadPacket(BinaryReader reader)
         {
-            AccountID = reader.ReadString();
-            Password = reader.ReadString();
+            AccountID = reader.ReadChars(32).ToString();
+            Password = reader.ReadChars(32).ToString();
         }
         protected override void WritePacket(BinaryWriter writer)
         {
-            writer.Write(AccountID);
-            writer.Write(Password);
+            writer.Write(AccountID.Substring(0, AccountID.Trim().Length).ToCharArray());
+            writer.Write('/');
+            writer.Write(Password.Substring(0,Password.Trim().Length).ToCharArray());
         }
     }
     public sealed class NewCharacter : Packet
