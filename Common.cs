@@ -4435,7 +4435,10 @@ public abstract class Packet
 
         if (rawBytes.Length < 6) return null; //'#'| 2Bytes: Packet Size | 2Bytes: Packet ID |data|'!''$'
 
+        EnDecode.fnDecode6BitBufA(rawBytes, rawBytes, 1, 3, 1, 4);
         int length = (rawBytes[2] << 8) + rawBytes[1];
+
+
 
         if (length > rawBytes.Length || length < 7) return null;
 
