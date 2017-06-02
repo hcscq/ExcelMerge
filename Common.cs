@@ -4433,23 +4433,23 @@ public abstract class Packet
 
         Packet p;
 
-        if (rawBytes.Length < 6) return null; //'#'| 2Bytes: Packet Size | 2Bytes: Packet ID |data|'!''$'
+        if (rawBytes.Length < 4) return null; //'#'| 2Bytes: Packet Size | 2Bytes: Packet ID |data|'!''$'
 
         EnDecode.fnDecode6BitBufA(rawBytes, rawBytes, 1, 3, 1, 4);
         int length = (rawBytes[2] << 8) + rawBytes[1];
 
 
 
-        if (length > rawBytes.Length || length < 7) return null;
+        if (length > rawBytes.Length || length < 0) return null;
 
-        EnDecode.fnDecode6BitBufA(rawBytes, rawBytes, 0,length-6, 3,length-2);
+        EnDecode.fnDecode6BitBufA(rawBytes, rawBytes, 0,length, 4,4+length);
 
-        using (MemoryStream stream = new MemoryStream(rawBytes, 0, length - 2))
+        using (MemoryStream stream = new MemoryStream(rawBytes, 0, length))
         using (BinaryReader reader = new BinaryReader(stream))
         {
             try
             {
-                reader.ReadInt32();
+                //reader.ReadInt32();
 
                 short id = reader.ReadInt16();
 
@@ -4504,13 +4504,17 @@ public abstract class Packet
         {
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
+                stream.Seek(2, SeekOrigin.Begin);
+                //stream.GetBuffer();
                 writer.Write(Index);
                 WritePacket(writer);
+                stream.Seek(0, SeekOrigin.Begin);
+                writer.Write((short)(stream.Length-2+(stream.Length)/3));
                 pureData = new byte[stream.Length + ((2 + stream.Length) / 3)];
-                EnDecode.fnEncode6BitBufA(stream.ToArray(),pureData);
+                EnDecode.fnEncode6BitBufA(stream.ToArray(),pureData,0);
                 stream.Seek(0, SeekOrigin.Begin);
                 writer.Write('#');
-                writer.Write((short)(pureData.Length+5));
+                //EnDecode.fnEncode6BitBufA( pureData.Length, pureData, 0);
                 writer.Write(pureData);
                 writer.Write('!');
                 writer.Write('$');

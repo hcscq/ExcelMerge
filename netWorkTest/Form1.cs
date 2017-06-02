@@ -8,7 +8,7 @@ using netWorkTest.MirNetwork;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Text;
-
+using C = ClientPackets;
 namespace netWorkTest
 {
     public partial class NetWork : Form
@@ -23,9 +23,19 @@ namespace netWorkTest
         {
             InitializeComponent();
             this.Disposed += new EventHandler(OnClose);
-            InitialClientNetWork();
+            //InitialClientNetWork();
             Packet.IsServer = false;
             //InitialServerNetwork();
+            string str = "#=L>>><v!$";
+            byte[] rawBytes = ASCIIEncoding.Default.GetBytes("#zt<>>><v");
+            int tran=EnDecode.fnDecode6BitBufA(rawBytes, rawBytes, 1, 3, 1, 4);
+            int length = (rawBytes[2] << 8) + rawBytes[1];
+            length = 0;
+
+            rawBytes = new byte[1024];
+            rawBytes=(new C.KeepAlive()).GetPacketBytesEx() as byte[];
+            Packet.ReceivePacketEx(rawBytes,out rawBytes);
+
         }
         private void OnClose(object sender,EventArgs e)
         { Running = false; }
