@@ -115,7 +115,7 @@ namespace ExcelMerge
                             ListSheetInfo.Add(loc_info);
                             continue;
                         }
-                        dt = ExcelHelper.ExecuteDataTable(Con_CurChildExcel, @"select * from [" + it + "] ", null);
+                        dt = ExcelHelper.ExecuteDataTable(Con_CurChildExcel, @"select * from [" + it + "A:I] ", null);
                         if (dt.Rows.Count > 2)
                             for (int i = 2; i < dt.Rows.Count; i++)
                             {
