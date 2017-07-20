@@ -115,29 +115,68 @@ namespace ExcelMerge
                             ListSheetInfo.Add(loc_info);
                             continue;
                         }
-                        dt = ExcelHelper.ExecuteDataTable(Con_CurChildExcel, @"select * from [" + it + "A:I] ", null);
-                        if (dt.Rows.Count > 2)
-                            for (int i = 2; i < dt.Rows.Count; i++)
-                            {
-                                if ((dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString())) && (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
-                                    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) &&
-                                    (dt.Rows[i]["F6"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F6"].ToString())) && (dt.Rows[i]["F7"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F7"].ToString())))
-                                    continue;
-                                dr = mainDt.NewRow();
-                                dr["商务代表"] = dt.Rows[0]["F2"];
-                                dr["上级经理"] = dt.Rows[0]["F4"];
-                                dr["医院名称"] = dt.Rows[i]["F4"] == null ? "未填写" : dt.Rows[i]["F4"];
-                                dr["医生姓名"] = dt.Rows[i]["F3"] == null ? "未填写" : dt.Rows[i]["F3"];
-                                dr["科室"] = dt.Rows[i]["F5"] == null ? "未填写" : dt.Rows[i]["F5"];
-                                dr["客户性质"] = dt.Rows[i]["F6"] == null ? "未填写" : dt.Rows[i]["F6"];
-                                dr["当日情况反馈"] = dt.Rows[i]["F7"] == null ? "未填写" : dt.Rows[i]["F7"];
-                                dr["计划"] = dt.Rows[i]["F8"] == null ? " " : dt.Rows[i]["F8"];
-                                dr["省区意见"] = dt.Rows[i]["F9"] == null ? " " : dt.Rows[i]["F9"];
-                                mainDt.Rows.Add(dr);
-                                //sssss = GetInsertStr(dr);
-                                if (0 < ExcelHelper.ExecuteNonQuery(Con_MainExcel, GetInsertStr(dr), null))
-                                    loc_info.dealCount++;
-                            }
+                        dt = ExcelHelper.ExecuteDataTable(Con_CurChildExcel, @"select * from [" + it + "A:P] ", null);
+
+
+                        try
+                        {
+                            if (dt.Rows.Count > 2)
+                                for (int i = 2; i < dt.Rows.Count; i++)
+                                {
+                                    //if ((dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString())) && (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
+                                    //    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) &&
+                                    //    (dt.Rows[i]["F6"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F6"].ToString())) && (dt.Rows[i]["F7"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F7"].ToString())))
+                                    //    continue;
+                                    dr = mainDt.NewRow();
+                                    if (dt.Rows[i]["F1"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F1"].ToString()))
+                                        dr["所属大区"] = dt.Rows[1]["F1"];
+                                    else
+                                        dr["所属大区"] = dt.Rows[i]["F1"];
+
+                                    if (dt.Rows[i]["F2"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F2"].ToString()))
+                                        dr["所属省区"] = dt.Rows[1]["F2"];
+                                    else dr["所属省区"] = dt.Rows[i]["F2"];
+
+                                    if (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
+                                        dr["商务代表"] = dt.Rows[1]["F3"];
+                                    else dr["商务代表"] = dt.Rows[i]["F3"];
+
+                                    if (dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString()))
+                                        dr["上级经理"] = dt.Rows[1]["F4"];
+                                    else dr["上级经理"] = dt.Rows[i]["F4"];
+
+                                    dr["拜访日期"] = dt.Rows[i]["F5"];
+                                    dr["医院名称"] = dt.Rows[i]["F6"];
+                                    dr["医生姓名"] = dt.Rows[i]["F7"];
+                                    dr["科室"] = dt.Rows[i]["F8"];
+                                    dr["上月订单数"] = dt.Rows[i]["F9"];
+                                    dr["本周当前_订单数"] = dt.Rows[i]["F10"];
+                                    dr["关注患者数"] = dt.Rows[i]["F11"];
+                                    dr["拜访目的_（需要解决的问题）"] = dt.Rows[i]["F12"];
+                                    dr["当日情况反馈_（需为有价值信息，作为备案便于下次跟进）"] = dt.Rows[i]["F13"];
+                                    dr["改善计划_（准备如何改进）"] = dt.Rows[i]["F14"];
+
+                                    //dr["医院名称"] = dt.Rows[i]["F4"] == null ? "未填写" : dt.Rows[i]["F4"];
+                                    //dr["医生姓名"] = dt.Rows[i]["F3"] == null ? "未填写" : dt.Rows[i]["F3"];
+                                    //dr["科室"] = dt.Rows[i]["F5"] == null ? "未填写" : dt.Rows[i]["F5"];
+                                    //dr["客户性质"] = dt.Rows[i]["F6"] == null ? "未填写" : dt.Rows[i]["F6"];
+                                    //dr["当日情况反馈"] = dt.Rows[i]["F7"] == null ? "未填写" : dt.Rows[i]["F7"];
+                                    //dr["计划"] = dt.Rows[i]["F8"] == null ? " " : dt.Rows[i]["F8"];
+                                    //dr["省区意见"] = dt.Rows[i]["F9"] == null ? " " : dt.Rows[i]["F9"];
+                                    mainDt.Rows.Add(dr);
+                                    //sssss = GetInsertStr(dr);
+                                    if (0 < ExcelHelper.ExecuteNonQuery(Con_MainExcel, GetInsertStr(dr), null))
+                                        loc_info.dealCount++;
+                                }
+                        }
+                        catch (Exception e1)
+                        {
+                            loc_info.operRe = OperRe.ERROR;
+                            Logger.WriteLog(loc_info.ToString() + e1.Message + "\r\n");
+                            retry = false;
+                            MessageBox.Show("文件" + fn + "处理出现问题.\r\n工作表名："+it + e1.Message);
+                            continue;
+                        }
                         loc_info.operRe = OperRe.ALLRIGHT;
                         ListSheetInfo.Add(loc_info);
                     }

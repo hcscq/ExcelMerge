@@ -68,7 +68,7 @@ namespace Utils
                 {
                     case ExcelVerion.Excel2003: //读取Excel97-2003版本
                         strConnection = "Provider=Microsoft.Jet.OLEDB.4.0; " +
-                                    "Data Source=" + ExcelFilePath + ";Extended Properties=Excel 8.0";
+                                    "Data Source=" + ExcelFilePath + ";Extended Properties='Excel 8.0'";
                         break;
                     case ExcelVerion.Excel2007: //读取Excel2007版本
                         strConnection = "Provider=Microsoft.ACE.OLEDB.12.0;Extended Properties='Excel 12.0;HDR=YES';data source=" + ExcelFilePath;
