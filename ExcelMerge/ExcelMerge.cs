@@ -101,6 +101,9 @@ namespace ExcelMerge
                     Con_CurChildExcel.Close();
                     DataTable dt;
                     DataRow dr;
+                    string[,] colName = { {"F1","F2","F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14"}
+                    , { "所属大区","所属省区","商务代表","上级经理","拜访日期","医院名称","医生姓名","科室","上月订单数","本周当前_订单数",
+                            "关注患者数","拜访目的_（需要解决的问题）","当日情况反馈_（需为有价值信息，作为备案便于下次跟进）","改善计划_（准备如何改进）"} };
                     foreach (var it in ChildSheetName)
                     {
                         loc_info = new sheetInfo();
@@ -120,41 +123,43 @@ namespace ExcelMerge
 
                         try
                         {
+                            int colNameIndex =dt.Columns[0].ColumnName.Equals("F1")? 0:1;
+                            
                             if (dt.Rows.Count > 2)
-                                for (int i = 2; i < dt.Rows.Count; i++)
+                                for (int i = 1-colNameIndex; i < dt.Rows.Count; i++)
                                 {
                                     //if ((dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString())) && (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
                                     //    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) &&
                                     //    (dt.Rows[i]["F6"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F6"].ToString())) && (dt.Rows[i]["F7"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F7"].ToString())))
                                     //    continue;
                                     dr = mainDt.NewRow();
-                                    if (dt.Rows[i]["F1"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F1"].ToString()))
-                                        dr["所属大区"] = dt.Rows[1]["F1"];
+                                    if (dt.Rows[i][colName[colNameIndex, 0]] == null || string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex,0]].ToString()))
+                                        dr["所属大区"] = dt.Rows[1][colName[colNameIndex, 0]];
                                     else
-                                        dr["所属大区"] = dt.Rows[i]["F1"];
+                                        dr["所属大区"] = dt.Rows[i][colName[colNameIndex, 0]];
 
-                                    if (dt.Rows[i]["F2"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F2"].ToString()))
-                                        dr["所属省区"] = dt.Rows[1]["F2"];
-                                    else dr["所属省区"] = dt.Rows[i]["F2"];
+                                    if (dt.Rows[i][colName[colNameIndex,1]] == null || string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex,1]].ToString()))
+                                        dr["所属省区"] = dt.Rows[1][colName[colNameIndex,1]];
+                                    else dr["所属省区"] = dt.Rows[i][colName[colNameIndex,1]];
 
-                                    if (dt.Rows[i]["F3"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F3"].ToString()))
-                                        dr["商务代表"] = dt.Rows[1]["F3"];
-                                    else dr["商务代表"] = dt.Rows[i]["F3"];
+                                    if (dt.Rows[i][colName[colNameIndex,2]] == null || string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex,2]].ToString()))
+                                        dr["商务代表"] = dt.Rows[1][colName[colNameIndex,2]];
+                                    else dr["商务代表"] = dt.Rows[i][colName[colNameIndex,2]];
 
-                                    if (dt.Rows[i]["F4"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F4"].ToString()))
-                                        dr["上级经理"] = dt.Rows[1]["F4"];
-                                    else dr["上级经理"] = dt.Rows[i]["F4"];
+                                    if (dt.Rows[i][colName[colNameIndex,3]] == null || string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex,3]].ToString()))
+                                        dr["上级经理"] = dt.Rows[1][colName[colNameIndex,3]];
+                                    else dr["上级经理"] = dt.Rows[i][colName[colNameIndex,3]];
 
-                                    dr["拜访日期"] = dt.Rows[i]["F5"];
-                                    dr["医院名称"] = dt.Rows[i]["F6"];
-                                    dr["医生姓名"] = dt.Rows[i]["F7"];
-                                    dr["科室"] = dt.Rows[i]["F8"];
-                                    dr["上月订单数"] = dt.Rows[i]["F9"];
-                                    dr["本周当前_订单数"] = dt.Rows[i]["F10"];
-                                    dr["关注患者数"] = dt.Rows[i]["F11"];
-                                    dr["拜访目的_（需要解决的问题）"] = dt.Rows[i]["F12"];
-                                    dr["当日情况反馈_（需为有价值信息，作为备案便于下次跟进）"] = dt.Rows[i]["F13"];
-                                    dr["改善计划_（准备如何改进）"] = dt.Rows[i]["F14"];
+                                    dr["拜访日期"] = dt.Rows[i][colName[colNameIndex,4]];
+                                    dr["医院名称"] = dt.Rows[i][colName[colNameIndex, 5]];
+                                    dr["医生姓名"] = dt.Rows[i][colName[colNameIndex, 6]];
+                                    dr["科室"] = dt.Rows[i][colName[colNameIndex, 7]];
+                                    dr["上月订单数"] = dt.Rows[i][colName[colNameIndex, 8]];
+                                    dr["本周当前_订单数"] = dt.Rows[i][colName[colNameIndex, 9]];
+                                    dr["关注患者数"] = dt.Rows[i][colName[colNameIndex, 10]];
+                                    dr["拜访目的_（需要解决的问题）"] = dt.Rows[i][colName[colNameIndex, 11]];
+                                    dr["当日情况反馈_（需为有价值信息，作为备案便于下次跟进）"] = dt.Rows[i][colName[colNameIndex, 12]];
+                                    dr["改善计划_（准备如何改进）"] = dt.Rows[i][colName[colNameIndex, 13]];
 
                                     //dr["医院名称"] = dt.Rows[i]["F4"] == null ? "未填写" : dt.Rows[i]["F4"];
                                     //dr["医生姓名"] = dt.Rows[i]["F3"] == null ? "未填写" : dt.Rows[i]["F3"];
