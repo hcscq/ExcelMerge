@@ -78,6 +78,7 @@ namespace ExcelMerge
                 return;
             }
             ChildrenFilesName=Directory.GetFiles(Str_ChildrenDir, "*.xls").ToList();
+            ChildrenFilesName.AddRange(Directory.GetFiles(Str_ChildrenDir, "*.xlsx").ToList());
         }
         public void MergeExcel()
         {
@@ -132,8 +133,12 @@ namespace ExcelMerge
                                     //    && (dt.Rows[i]["F5"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F5"].ToString())) &&
                                     //    (dt.Rows[i]["F6"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F6"].ToString())) && (dt.Rows[i]["F7"] == null || string.IsNullOrWhiteSpace(dt.Rows[i]["F7"].ToString())))
                                     //    continue;
+                                    if (dt.Rows[i][colName[colNameIndex, 0]] != null && !string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex, 0]].ToString()) && dt.Rows[i][colName[colNameIndex, 0]].ToString().Contains("*备注"))
+                                        continue;
+
                                     dr = mainDt.NewRow();
-                                    if (dt.Rows[i][colName[colNameIndex, 0]] == null || string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex,0]].ToString()))
+
+                                    if (dt.Rows[i][colName[colNameIndex, 0]] == null || string.IsNullOrWhiteSpace(dt.Rows[i][colName[colNameIndex, 0]].ToString()))
                                         dr["所属大区"] = dt.Rows[1][colName[colNameIndex, 0]];
                                     else
                                         dr["所属大区"] = dt.Rows[i][colName[colNameIndex, 0]];
