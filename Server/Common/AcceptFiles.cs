@@ -117,13 +117,13 @@ namespace BusinessLogicLayer
                         long fileLen = 0;
                         ClientPacketId Key = 0;
                         clientFiles.Add(socketClient,new List<string>());
-
+                        
                         while ((size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
                         {
                             if (Mode == 0) Key = ClientPacketId.DataWithFileName;
                             else if (Mode == 1)
                             {
-                                if (len + size > fileLen)
+                                if (len + size >= fileLen)
                                     Key = ClientPacketId.FileEnd;
                                 else
                                     Key = ClientPacketId.FileData;
@@ -155,8 +155,11 @@ namespace BusinessLogicLayer
                                     }
                                     break;
                                 case ClientPacketId.FileEnd:
+                                    fs.Write(buffer, offset,(int)(fileLen-len));
                                     fs.Flush();
+                                    fs.Close();
                                     clientFiles[socketClient].Add(fileName);
+                                    Console.WriteLine("文件保存成功:" + fileName);
                                     fileName = string.Empty;
                                     fileEx = string.Empty;
                                     Mode = 0;
@@ -166,7 +169,6 @@ namespace BusinessLogicLayer
                                 default:
                                     break;
                             }
-                            
 
                             fs.Write(buffer, offset, size-offset);
                             len += size;
@@ -179,6 +181,7 @@ namespace BusinessLogicLayer
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
 
                         socketClient.Close();
+
                         //ShwMsgForView.ShwMsgforView(lstbxMsgView, "文件保存成功:" + fileName);
                         //ShwMsgForView.ShwMsgforView(lstbxMsgView, "接收文件用时:" + oTime.ToString() + ",文件大小：" + len / 1024 + "kb");
                     }

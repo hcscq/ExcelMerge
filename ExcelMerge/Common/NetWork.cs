@@ -110,53 +110,48 @@ namespace MyCharRoomClient
                 int readLen = 0;                                // 已读取部分
                 int offSet = 0;
                 byte[] buffer = null;
+                byte[] bufferSend = new byte[maxBufferLength];
+                using (Stream stream = new MemoryStream(bufferSend))
+                using (BinaryWriter bw = new BinaryWriter(stream))
+                {
+                    bw.Write((byte)ClientPacketId.DataWithFileName);
+                    bw.Write(Path.GetFileNameWithoutExtension(fileInfo.Name));
+                    bw.Write(fileInfo.Extension);
+                    bw.Write(stream.Position + fileLen + 8);
+                    offSet = (int)stream.Position;
+                }
 
-                if (fileLen <= maxBufferLength-4)
+
+                if (fileLen+offSet <= maxBufferLength)
                 {            /* 文件可以一次读取*/
-                    buffer = new byte[fileLen+ fileInfo.Name.Length+3];
-                    using (Stream stream = new MemoryStream(buffer))
-                    using (BinaryWriter bw = new BinaryWriter(stream))
-                    {
-                        bw.Write((byte)ClientPacketId.DataWithFileName);
-                        bw.Write(Path.GetFileNameWithoutExtension(fileInfo.Name));
-                        bw.Write(fileInfo.Extension);
-                        bw.Write(stream.Position + fileLen+8);
-                        offSet = (int)stream.Position;
+                    buffer = new byte[fileLen+offSet];
 
+                    Array.Copy(bufferSend, buffer, offSet);
 
-                    }
-                    readLen += offSet;
-
-                    readLen = fs.Read(buffer, offSet, (int)fileLen);
+                    readLen = fs.Read(bufferSend, 0, (int)fileLen);
+                    Array.Copy(bufferSend,0, buffer,offSet, readLen);
                     flag = SendData(socket, buffer, outTime);
                 }
                 else
                 {
                     /* 循环读取文件,并发送 */
+                    buffer = new byte[maxBufferLength - offSet];
 
-                    buffer = new byte[maxBufferLength];
-                    using (Stream stream = new MemoryStream(buffer))
-                    using (BinaryWriter bw = new BinaryWriter(stream))
-                    {
-                        bw.Write((byte)ClientPacketId.DataWithFileName);
-                        bw.Write(Path.GetFileNameWithoutExtension(fileInfo.Name));
-                        bw.Write(fileInfo.Extension);
-                        bw.Write(stream.Position + fileLen+8);
-                        offSet = (int)stream.Position;
-                    }
+                    readLen = fs.Read(buffer, 0, buffer.Length);
 
-                    readLen = fs.Read(buffer, offSet, maxBufferLength - offSet);
+                    Array.Copy(buffer, 0, bufferSend, offSet, readLen);
 
-                    if ((flag = SendData(socket, buffer, outTime)) < 0)
+                    if ((flag = SendData(socket, bufferSend, outTime)) < 0)
                     {
                         throw new Exception("Send 0 byte.");
                     }
-                    leftLen -= (maxBufferLength - offSet);
+
+                    leftLen -= readLen;
                     while (leftLen > 0)
                     {
                         if (leftLen < maxBufferLength)
                         {
-                            buffer = new byte[leftLen];
+                            buffer = new byte[maxBufferLength];
                             //buffer[0] = (byte)ClientPacketId.FileData;
                             readLen = fs.Read(buffer, 0, Convert.ToInt32(leftLen));
                         }
@@ -174,9 +169,6 @@ namespace MyCharRoomClient
                     }
                 }
 
-                buffer = new byte[maxBufferLength];
-                buffer[0] = (byte)ClientPacketId.FileEnd;
-                flag=SendData(socket,buffer,outTime);
                 fs.Flush();
                 fs.Close();
             }

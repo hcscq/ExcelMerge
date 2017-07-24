@@ -54,6 +54,7 @@ namespace Client
                 for (int i = 0; i < ChildrenFilesName.Count; i++)
                 {
                     Net.SendFile(SerSocket,ChildrenFilesName[i],Setting.MaxBuffLength,Setting.OutTime);
+                    
                 }
                 MessageBox.Show("All sended,please wait server return.");
             }
