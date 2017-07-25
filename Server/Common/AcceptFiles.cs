@@ -79,7 +79,7 @@ namespace Server
                     socketArg.Completed += SocketArg_Completed;
                     if (!connection.ReceiveAsync(socketArg))
                         SocketArg_Completed(connection,socketArg);
-                    Console.WriteLine("客户端连接成功" + connection.RemoteEndPoint.ToString());
+                    Console.WriteLine("客户端连接成功:" + connection.RemoteEndPoint.ToString());
 
                 }
             }
@@ -95,7 +95,7 @@ namespace Server
                     ClientFiles cf = new ClientFiles();
                     cf.FilesCount = e.Buffer[4] << 24 | e.Buffer[3] << 16 | e.Buffer[2] << 8 | e.Buffer[1];
                     clientFiles.Add(socket, cf);
-                    Console.WriteLine(socket.RemoteEndPoint.ToString() + "FilesCount:" + cf.FilesCount + ".");
+                    Console.WriteLine(socket.RemoteEndPoint.ToString() + " FilesCount:" + cf.FilesCount + ".");
                     //创建通信线程
                     ParameterizedThreadStart pts = new ParameterizedThreadStart(RecMsg);
                     Thread thradRecMsg = new Thread(pts);
@@ -205,9 +205,9 @@ namespace Server
                         fileName = fileSavePath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Main.xlsx";
                         m.MergeExcel(clientFiles[socketClient].filesName, fileName);
                         Net.SendFile(socketClient,fileName,Setting.MaxBuffLength,Setting.OutTime);
-                        Console.WriteLine(socketClient.RemoteEndPoint + "Result file sended.");
+                        Console.WriteLine(socketClient.RemoteEndPoint + " Result file sended.");
 
-                        Console.WriteLine(socketClient.RemoteEndPoint + "Disconnect");
+                        Console.WriteLine(socketClient.RemoteEndPoint + " Disconnect");
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
 
                         socketClient.Close();

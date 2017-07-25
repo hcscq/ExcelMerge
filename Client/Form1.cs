@@ -159,7 +159,7 @@ namespace Client
                 MessageBox.Show("在此程序当前目录下的Children文件夹中放子Excel(注意是XLS 2003格式的).");
                 return;
             }
-            ChildrenFilesName = Directory.GetFiles(Str_ChildrenDir, "*.xls").ToList();
+            ChildrenFilesName = Directory.GetFiles(Str_ChildrenDir, "*.xls?").ToList();
 
             //ChildrenFilesName.AddRange(Directory.GetFiles(Str_ChildrenDir, "*.xlsx").ToList());
         }

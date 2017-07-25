@@ -9,7 +9,7 @@ namespace ExcelMerge.Common
 {
     public static class Logger
     {
-        private static string path = @"\Log\"; //Application.StartupPath + @"\Log\" ;
+        private static string path = @".\Log\"; //Application.StartupPath + @"\Log\" ;
         private static string fullName = path + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
         public static void WriteLog(string log, bool insertTime = true)
         {
