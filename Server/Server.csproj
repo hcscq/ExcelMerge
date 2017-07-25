@@ -49,7 +49,14 @@
     <Compile Include="..\ExcelMerge\Common\ExcelHelper.cs">
       <Link>Common\ExcelHelper.cs</Link>
     </Compile>
+    <Compile Include="..\ExcelMerge\Common\Logger.cs">
+      <Link>Common\Logger.cs</Link>
+    </Compile>
+    <Compile Include="..\ExcelMerge\Common\NetWork.cs">
+      <Link>Common\NetWork.cs</Link>
+    </Compile>
     <Compile Include="Common\AcceptFiles.cs" />
+    <Compile Include="Merge.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

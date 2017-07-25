@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using ExcelMerge.Common;
-namespace MyCharRoomClient
+namespace SendCommon
 {
 
     /// <summary>

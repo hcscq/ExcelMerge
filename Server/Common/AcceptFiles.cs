@@ -8,8 +8,9 @@ using System.Net;
 //using System.Windows.Forms;
 using System.IO;
 using ExcelMerge.Common;
+using SendCommon;
 
-namespace BusinessLogicLayer
+namespace Server
 {
     public class ReceiveFiles
     {
@@ -19,7 +20,12 @@ namespace BusinessLogicLayer
         //private static ListBox listbOnline;//显示用户连接列表
         private static bool Working = true;
         private static Dictionary<string, Socket> dict = new Dictionary<string, Socket>();
-        private static Dictionary<Socket, List<string>> clientFiles = new Dictionary<Socket, List<string>>();
+        private static Dictionary<Socket, ClientFiles> clientFiles = new Dictionary<Socket, ClientFiles>();
+        public class ClientFiles
+        {
+            public List<string> filesName = new List<string>();
+            public int FilesCount = 0;
+        }
         /// <summary>
         /// 开始监听
         /// </summary>
@@ -43,8 +49,7 @@ namespace BusinessLogicLayer
                 threadWatch = new Thread(WatchConnecting);
                 threadWatch.IsBackground = true;//设置为后台线程
                 threadWatch.Start();//开始线程
-                                    //ShowMgs("服务器启动监听成功");
-                                    //ShwMsgForView.ShwMsgforView(lstbxMsgView, "服务器启动监听成功");
+
                 Console.WriteLine("服务器启动监听成功!");
                 return null;
             }
@@ -70,13 +75,33 @@ namespace BusinessLogicLayer
                     //将与客户端通信的套接字对象connection添加到键值对集合中，并以客户端Ip做为健
                     dict.Add(connection.RemoteEndPoint.ToString(), connection);
 
+                    SocketAsyncEventArgs socketArg = BufferManager.GetBuffer();
+                    socketArg.Completed += SocketArg_Completed;
+                    if (!connection.ReceiveAsync(socketArg))
+                        SocketArg_Completed(connection,socketArg);
+                    Console.WriteLine("客户端连接成功" + connection.RemoteEndPoint.ToString());
+
+                }
+            }
+        }
+
+        private static void SocketArg_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            Socket socket = sender as Socket;
+            if (e.SocketError == SocketError.Success)
+            {
+                if (ClientPacketId.FileCount == (ClientPacketId)e.Buffer[0])
+                {
+                    ClientFiles cf = new ClientFiles();
+                    cf.FilesCount = e.Buffer[4] << 24 | e.Buffer[3] << 16 | e.Buffer[2] << 8 | e.Buffer[1];
+                    clientFiles.Add(socket, cf);
+                    Console.WriteLine(socket.RemoteEndPoint.ToString() + "FilesCount:" + cf.FilesCount + ".");
                     //创建通信线程
                     ParameterizedThreadStart pts = new ParameterizedThreadStart(RecMsg);
                     Thread thradRecMsg = new Thread(pts);
                     thradRecMsg.IsBackground = true;
-                    thradRecMsg.Start(connection);
-                    //ShwMsgForView.ShwMsgforView(lstbxMsgView, "客户端连接成功" + connection.RemoteEndPoint.ToString());
-                    Console.WriteLine("客户端连接成功" + connection.RemoteEndPoint.ToString());
+                    thradRecMsg.Start(socket);
+
                 }
             }
         }
@@ -116,9 +141,8 @@ namespace BusinessLogicLayer
                         int Mode = 0;//0:wait file header 1:wait data
                         long fileLen = 0;
                         ClientPacketId Key = 0;
-                        clientFiles.Add(socketClient,new List<string>());
                         
-                        while ((size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
+                        while (clientFiles[socketClient].filesName.Count < clientFiles[socketClient].FilesCount&&(size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
                         {
                             if (Mode == 0) Key = ClientPacketId.DataWithFileName;
                             else if (Mode == 1)
@@ -158,8 +182,8 @@ namespace BusinessLogicLayer
                                     fs.Write(buffer, offset,(int)(fileLen-len));
                                     fs.Flush();
                                     fs.Close();
-                                    clientFiles[socketClient].Add(fileName);
-                                    Console.WriteLine("文件保存成功:" + fileName);
+                                    clientFiles[socketClient].filesName.Add(fileName);
+                                    Console.WriteLine("File saved:" + fileName);
                                     fileName = string.Empty;
                                     fileEx = string.Empty;
                                     Mode = 0;
@@ -175,19 +199,25 @@ namespace BusinessLogicLayer
                         }
                         DateTime oTimeEnd = DateTime.Now;
                         TimeSpan oTime = oTimeEnd.Subtract(oTimeBegin);
+                        Console.WriteLine("All files received.");
 
+                        Merge m = new Merge();
+                        fileName = fileSavePath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Main.xlsx";
+                        m.MergeExcel(clientFiles[socketClient].filesName, fileName);
+                        Net.SendFile(socketClient,fileName,Setting.MaxBuffLength,Setting.OutTime);
+                        Console.WriteLine(socketClient.RemoteEndPoint + "Result file sended.");
 
-                        Console.WriteLine(socketClient.RemoteEndPoint + "断开连接");
+                        Console.WriteLine(socketClient.RemoteEndPoint + "Disconnect");
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
 
                         socketClient.Close();
-
+                        return;
                         //ShwMsgForView.ShwMsgforView(lstbxMsgView, "文件保存成功:" + fileName);
                         //ShwMsgForView.ShwMsgforView(lstbxMsgView, "接收文件用时:" + oTime.ToString() + ",文件大小：" + len / 1024 + "kb");
                     }
                     catch(Exception e1)
                     {
-                        Console.WriteLine(socketClient.RemoteEndPoint + "下线了");
+                        Console.WriteLine(socketClient.RemoteEndPoint + "Offline");
                         clientFiles.Remove(socketClient);
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
 
