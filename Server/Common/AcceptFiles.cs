@@ -209,6 +209,7 @@ namespace Server
 
                         Console.WriteLine(socketClient.RemoteEndPoint + " Disconnect");
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
+                        clientFiles.Remove(socketClient);
 
                         socketClient.Close();
                         return;

@@ -60,3 +60,4 @@ ExcelMerge/bin/Debug/WindowsFormsApplication1.pdb
 *.Cache
 ExcelMerge/obj/Debug/ExcelMerge.csproj.GenerateResource.Cache
 *.Cache
+*.cache
