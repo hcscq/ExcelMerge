@@ -55,8 +55,9 @@ namespace Client
             SerSocket = e.ConnectSocket;
             if (SerSocket.Connected)
             {
-                SocketAsyncEventArgs asyncArg = BufferManager.GetBuffer();
+                SocketAsyncEventArgs asyncArg = new SocketAsyncEventArgs();
                 if (asyncArg == null) throw new Exception("Not enough BUFF.");
+                asyncArg.SetBuffer(new byte[Setting.MaxBuffLength], 0, Setting.MaxBuffLength);
                 asyncArg.Completed += AsyncArg_Completed;
                 using (Stream stream = new MemoryStream(asyncArg.Buffer))
                 using (BinaryWriter br = new BinaryWriter(stream))
@@ -68,7 +69,6 @@ namespace Client
                     AsyncArg_Completed(SerSocket,asyncArg);
 
             }
-            BufferManager.ReleaseBuffer(e);
         }
 
         private void AsyncArg_Completed(object sender, SocketAsyncEventArgs e)
@@ -76,10 +76,8 @@ namespace Client
             for (int i = 0; i < ChildrenFilesName.Count; i++)
                 Net.SendFile(SerSocket, ChildrenFilesName[i], Setting.MaxBuffLength, Setting.OutTime);
 
-            BufferManager.ReleaseBuffer(e);
             MessageBox.Show("All sended,please wait server return.");
             SocketAsyncEventArgs asyncArg = BufferManager.GetBuffer();
-            asyncArg = BufferManager.GetBuffer();
             asyncArg.Completed += new EventHandler<SocketAsyncEventArgs>(IOCompleted);
             //asyncArg.SetBuffer(new byte[Setting.MaxBuffLength],0);
             if (!SerSocket.ReceiveAsync(asyncArg))

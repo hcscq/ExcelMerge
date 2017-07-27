@@ -24,7 +24,7 @@ namespace ExcelMerge.Common
     }
     public static class Setting
     {
-        public const string IP = "127.0.0.1";
+        public const string IP = "192.168.1.100";
         public const string Port = "8012";
         public const int MaxBuffLength = 512;
         public const int OutTime = 5000;
