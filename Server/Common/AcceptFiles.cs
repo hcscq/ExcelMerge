@@ -95,7 +95,7 @@ namespace Server
                     ClientFiles cf = new ClientFiles();
                     cf.FilesCount = e.Buffer[4] << 24 | e.Buffer[3] << 16 | e.Buffer[2] << 8 | e.Buffer[1];
                     clientFiles.Add(socket, cf);
-                    Console.WriteLine(socket.RemoteEndPoint.ToString() + " FilesCount:" + cf.FilesCount + ".");
+                    Console.WriteLine(socket.RemoteEndPoint.ToString() + " FilesCount:" + cf.FilesCount + "."+e.BytesTransferred);
                     //创建通信线程
                     ParameterizedThreadStart pts = new ParameterizedThreadStart(RecMsg);
                     Thread thradRecMsg = new Thread(pts);
@@ -104,6 +104,7 @@ namespace Server
 
                 }
             }
+            BufferManager.ReleaseBuffer(e);
         }
 
         /// <summary>
@@ -121,6 +122,10 @@ namespace Server
                 //将接收到的数据存入arrMsgRec数组,并返回真正接受到的数据的长度   
                 if (socketClient.Connected)
                 {
+                    string fileName = string.Empty;
+                    string fileEx = string.Empty;
+                    int Mode = 0;//0:wait file header 1:wait data
+                    ClientPacketId Key = 0;
                     try
                     {
                         //因为终端每次发送文件的最大缓冲区是512字节，所以每次接收也是定义为512字节
@@ -129,8 +134,7 @@ namespace Server
                         long len = 0;
                         string fileSavePath = @".\\files\\";//获得用户保存文件的路径
 
-                        string fileName=string.Empty;
-                        string fileEx = string.Empty;
+
                         //创建文件流，然后让文件流来根据路径创建一个文件
                         FileStream fs = null;
                         //从终端不停的接受数据，然后写入文件里面，只到接受到的数据为0为止，则中断连接
@@ -138,11 +142,11 @@ namespace Server
                         DateTime oTimeBegin = DateTime.Now;
 
                         int offset = 0;
-                        int Mode = 0;//0:wait file header 1:wait data
+
                         long fileLen = 0;
-                        ClientPacketId Key = 0;
-                        
-                        while (clientFiles[socketClient].filesName.Count < clientFiles[socketClient].FilesCount&&(size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
+
+
+                        while (clientFiles[socketClient].filesName.Count < clientFiles[socketClient].FilesCount && (size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
                         {
                             if (Mode == 0) Key = ClientPacketId.DataWithFileName;
                             else if (Mode == 1)
@@ -156,9 +160,11 @@ namespace Server
                             {
                                 case ClientPacketId.FileData:
                                     offset = 0;
+                                    fs.Write(buffer, offset, size - offset);
+                                    len += size;
                                     break;
                                 case ClientPacketId.FileName:
-                                case ClientPacketId.DataWithFileName: 
+                                case ClientPacketId.DataWithFileName:
                                     using (Stream stream = new MemoryStream(buffer))
                                     using (BinaryReader br = new BinaryReader(stream))
                                     {
@@ -167,20 +173,28 @@ namespace Server
                                         fileEx = br.ReadString();
                                         fileLen = br.ReadInt64();
                                         offset = (int)stream.Position;
+                                        Console.WriteLine("Ready for :" + fileName);
+                                        if(string.IsNullOrWhiteSpace(fileName))
+                                        foreach (var item in buffer)
+                                            Console.Write(item);
                                     }
 
                                     if (!string.IsNullOrEmpty(fileName))
                                     {
                                         if (!Directory.Exists(fileSavePath))
                                             Directory.CreateDirectory(fileSavePath);
-                                        fileName = fileSavePath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + fileName+"."+fileEx;
+                                        fileName = fileSavePath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + fileName + "." + fileEx;
+                                        
                                         fs = new FileStream(fileName, FileMode.Create);
+                                        Console.WriteLine("Created :" + fileName);
                                         Mode = 1;
+                                        fs.Write(buffer, offset, size - offset);
+                                        len += size;
                                     }
                                     break;
                                 case ClientPacketId.FileEnd:
-                                    fs.Write(buffer, offset,(int)(fileLen-len));
-                                    fs.Flush();
+                                    fs.Write(buffer, offset, (int)(fileLen - len));
+
                                     fs.Close();
                                     clientFiles[socketClient].filesName.Add(fileName);
                                     Console.WriteLine("File saved:" + fileName);
@@ -189,13 +203,11 @@ namespace Server
                                     Mode = 0;
                                     len = 0;
                                     fileLen = 0;
-                                    continue;
+                                    break;
                                 default:
                                     break;
                             }
 
-                            fs.Write(buffer, offset, size-offset);
-                            len += size;
                         }
                         DateTime oTimeEnd = DateTime.Now;
                         TimeSpan oTime = oTimeEnd.Subtract(oTimeBegin);
@@ -218,11 +230,13 @@ namespace Server
                     }
                     catch(Exception e1)
                     {
+                        Console.WriteLine(e1.Message+" FileName:"+fileName+" Mode:"+Mode+ "ClientPacketId:" +Key);
+                        Console.WriteLine(e1.StackTrace);
                         Console.WriteLine(socketClient.RemoteEndPoint + "Offline");
                         clientFiles.Remove(socketClient);
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
 
-                        break;
+                        return;
                     }
                 }
                 else

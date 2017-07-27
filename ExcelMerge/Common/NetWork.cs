@@ -169,7 +169,7 @@ namespace SendCommon
                     }
                 }
 
-                fs.Flush();
+                //fs.Flush();
                 fs.Close();
             }
             catch (IOException e)

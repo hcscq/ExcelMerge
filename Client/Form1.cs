@@ -68,6 +68,7 @@ namespace Client
                     AsyncArg_Completed(SerSocket,asyncArg);
 
             }
+            BufferManager.ReleaseBuffer(e);
         }
 
         private void AsyncArg_Completed(object sender, SocketAsyncEventArgs e)
@@ -126,7 +127,7 @@ namespace Client
                 {
                     fs.Write(arg.Buffer, offSet,(int)(fileLen+arg.BytesTransferred-ReadLen - offSet));
                     BufferManager.ReleaseBuffer(arg);
-                    fs.Flush();
+                    //fs.Flush();
                     fs.Close();
                     fs = null;
                     Mode = 0;
@@ -136,7 +137,7 @@ namespace Client
             }
             else
             {
-                if (fs != null) { fs.Flush();fs.Close();fs = null; }
+                if (fs != null) { fs.Close();fs = null; }
                 ((Socket)sender).Close();
                 BufferManager.ReleaseBuffer(arg);
                 Mode = 0;
