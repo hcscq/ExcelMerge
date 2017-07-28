@@ -27,6 +27,11 @@ namespace SendCommon
         /// </remarks>
         public static int SendData(Socket socket, byte[] buffer, int outTime)
         {
+            if (buffer.Length != Setting.MaxBuffLength)
+                throw new Exception("Length error");
+            if (socket.Send(buffer) == buffer.Length)
+                return 0;
+            else throw new Exception("Send too less.");
             if (socket == null || socket.Connected == false)
             {
                 throw new ArgumentException("参数socket 为null，或者未连接到远程计算机");
@@ -176,6 +181,7 @@ namespace SendCommon
             {
 
                 flag = -4;
+                throw new Exception("Not deal.");
             }
             return flag;
         }

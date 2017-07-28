@@ -20,7 +20,7 @@ namespace Server
         //private static ListBox listbOnline;//显示用户连接列表
         private static bool Working = true;
         private static Dictionary<string, Socket> dict = new Dictionary<string, Socket>();
-        private static Dictionary<Socket, ClientFiles> clientFiles = new Dictionary<Socket, ClientFiles>();
+        private static Dictionary<string, ClientFiles> clientFiles = new Dictionary<string, ClientFiles>();
         public class ClientFiles
         {
             public List<string> filesName = new List<string>();
@@ -75,7 +75,8 @@ namespace Server
                     //将与客户端通信的套接字对象connection添加到键值对集合中，并以客户端Ip做为健
                     dict.Add(connection.RemoteEndPoint.ToString(), connection);
 
-                    SocketAsyncEventArgs socketArg = BufferManager.GetBuffer();
+                    SocketAsyncEventArgs socketArg = new SocketAsyncEventArgs();
+                    socketArg.SetBuffer(new byte [Setting.MaxBuffLength],0, Setting.MaxBuffLength);
                     socketArg.Completed += SocketArg_Completed;
                     if (!connection.ReceiveAsync(socketArg))
                         SocketArg_Completed(connection,socketArg);
@@ -94,7 +95,8 @@ namespace Server
                 {
                     ClientFiles cf = new ClientFiles();
                     cf.FilesCount = e.Buffer[4] << 24 | e.Buffer[3] << 16 | e.Buffer[2] << 8 | e.Buffer[1];
-                    clientFiles.Add(socket, cf);
+                    clientFiles.Add(socket.RemoteEndPoint.ToString(), cf);
+                    
                     Console.WriteLine(socket.RemoteEndPoint.ToString() + " FilesCount:" + cf.FilesCount + "."+e.BytesTransferred);
                     //创建通信线程
                     ParameterizedThreadStart pts = new ParameterizedThreadStart(RecMsg);
@@ -104,7 +106,7 @@ namespace Server
 
                 }
             }
-            BufferManager.ReleaseBuffer(e);
+            //BufferManager.ReleaseBuffer(e);
         }
 
         /// <summary>
@@ -114,7 +116,8 @@ namespace Server
         private static void RecMsg(object socketClientPara)
         {
             Socket socketClient = socketClientPara as Socket;
-
+            string socketStr = socketClient.RemoteEndPoint.ToString();
+            byte[] bufferOld = new byte[Setting.MaxBuffLength];
             while (true)
             {
                 //定义一个接受用的缓存区（100M字节数组）
@@ -126,10 +129,11 @@ namespace Server
                     string fileEx = string.Empty;
                     int Mode = 0;//0:wait file header 1:wait data
                     ClientPacketId Key = 0;
+                    //因为终端每次发送文件的最大缓冲区是512字节，所以每次接收也是定义为512字节
+                    byte[] buffer = new byte[Setting.MaxBuffLength];
                     try
                     {
-                        //因为终端每次发送文件的最大缓冲区是512字节，所以每次接收也是定义为512字节
-                        byte[] buffer = new byte[Setting.MaxBuffLength];
+
                         int size = 0;
                         long len = 0;
                         string fileSavePath = @".\\files\\";//获得用户保存文件的路径
@@ -146,7 +150,7 @@ namespace Server
                         long fileLen = 0;
 
 
-                        while (clientFiles[socketClient].filesName.Count < clientFiles[socketClient].FilesCount && (size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
+                        while (clientFiles[socketStr].filesName.Count < clientFiles[socketStr].FilesCount && (size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
                         {
                             if (Mode == 0) Key = ClientPacketId.DataWithFileName;
                             else if (Mode == 1)
@@ -174,9 +178,9 @@ namespace Server
                                         fileLen = br.ReadInt64();
                                         offset = (int)stream.Position;
                                         Console.WriteLine("Ready for :" + fileName);
-                                        if(string.IsNullOrWhiteSpace(fileName))
-                                        foreach (var item in buffer)
-                                            Console.Write(item);
+                                        //if(string.IsNullOrWhiteSpace(fileName))
+                                        //foreach (var item in buffer)
+                                        //    Console.Write(item);
                                     }
 
                                     if (!string.IsNullOrEmpty(fileName))
@@ -196,7 +200,8 @@ namespace Server
                                     fs.Write(buffer, offset, (int)(fileLen - len));
 
                                     fs.Close();
-                                    clientFiles[socketClient].filesName.Add(fileName);
+                                    buffer.CopyTo(bufferOld,0);
+                                    clientFiles[socketStr].filesName.Add(fileName);
                                     Console.WriteLine("File saved:" + fileName);
                                     fileName = string.Empty;
                                     fileEx = string.Empty;
@@ -215,13 +220,13 @@ namespace Server
 
                         Merge m = new Merge();
                         fileName = fileSavePath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Main.xlsx";
-                        m.MergeExcel(clientFiles[socketClient].filesName, fileName);
+                        m.MergeExcel(clientFiles[socketStr].filesName, fileName);
                         Net.SendFile(socketClient,fileName,Setting.MaxBuffLength,Setting.OutTime);
                         Console.WriteLine(socketClient.RemoteEndPoint + " Result file sended.");
 
                         Console.WriteLine(socketClient.RemoteEndPoint + " Disconnect");
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
-                        clientFiles.Remove(socketClient);
+                        clientFiles.Remove(socketStr);
 
                         socketClient.Close();
                         return;
@@ -230,10 +235,15 @@ namespace Server
                     }
                     catch(Exception e1)
                     {
+                       foreach (var item in buffer)
+                                Console.Write(item+" ");
                         Console.WriteLine(e1.Message+" FileName:"+fileName+" Mode:"+Mode+ "ClientPacketId:" +Key);
+                        foreach (var item in bufferOld)
+                            Console.Write(item+" ");
                         Console.WriteLine(e1.StackTrace);
                         Console.WriteLine(socketClient.RemoteEndPoint + "Offline");
-                        clientFiles.Remove(socketClient);
+                        if(!clientFiles.Remove(socketStr))
+                            Console.WriteLine("Remove Failed.");
                         dict.Remove(socketClient.RemoteEndPoint.ToString());
 
                         return;
