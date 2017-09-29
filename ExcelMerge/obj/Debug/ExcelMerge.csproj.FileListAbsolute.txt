@@ -41,3 +41,7 @@ E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\bin\Debug\ExcelMerge.application
 E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.csprojResolveAssemblyReference.cache
 E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.exe.manifest
 E:\Mir\GitHub\ExcelMerge\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.application
+C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\bin\Debug\ExcelMerge.exe.manifest
+C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\bin\Debug\ExcelMerge.application
+C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.exe.manifest
+C:\Users\39438\Documents\GitHub\ExcelMerge\ExcelMerge\obj\Debug\ExcelMerge.application

@@ -64,7 +64,7 @@ namespace Server
         /// </summary>
         private static void WatchConnecting()
         {
-            while (true&&Working)//持续不断的监听客户端的请求
+            while (Working)//持续不断的监听客户端的请求
             {
                 //开始监听 客户端连接请求，注意：Accept方法，会阻断当前的线程
                 Socket connection = socketWatch.Accept();
@@ -172,6 +172,7 @@ namespace Server
                                     using (Stream stream = new MemoryStream(buffer))
                                     using (BinaryReader br = new BinaryReader(stream))
                                     {
+                                        Console.WriteLine("Curent thread:"+Thread.CurrentThread.ManagedThreadId);
                                         br.ReadByte();
                                         fileName = br.ReadString();
                                         fileEx = br.ReadString();
