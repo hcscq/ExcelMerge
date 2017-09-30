@@ -129,11 +129,11 @@ namespace SendCommon
 
                 if (fileLen+offSet <= maxBufferLength)
                 {            /* 文件可以一次读取*/
-                    buffer = new byte[fileLen+offSet];
+                    buffer = new byte[maxBufferLength];
 
                     Array.Copy(bufferSend, buffer, offSet);
 
-                    readLen = fs.Read(bufferSend, 0, (int)fileLen);
+                    readLen = fs.Read(bufferSend, 0, (int)fileLen);  
                     Array.Copy(bufferSend,0, buffer,offSet, readLen);
                     flag = SendData(socket, buffer, outTime);
                 }
@@ -154,15 +154,16 @@ namespace SendCommon
                     leftLen -= readLen;
                     while (leftLen > 0)
                     {
+                        buffer = new byte[maxBufferLength];
                         if (leftLen < maxBufferLength)
                         {
-                            buffer = new byte[maxBufferLength];
+                            //buffer = new byte[maxBufferLength];
                             //buffer[0] = (byte)ClientPacketId.FileData;
                             readLen = fs.Read(buffer, 0, Convert.ToInt32(leftLen));
                         }
                         else
                         {
-                            buffer = new byte[maxBufferLength];
+                            //buffer = new byte[maxBufferLength];
                             //buffer[0] = (byte)ClientPacketId.FileData;
                             readLen = fs.Read(buffer, 0, maxBufferLength);
                         }
