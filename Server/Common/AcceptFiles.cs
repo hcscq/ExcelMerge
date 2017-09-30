@@ -18,7 +18,7 @@ namespace Server
         private static Socket socketWatch = null;
         //private static ListBox lstbxMsgView;//显示接受的文件等信息
         //private static ListBox listbOnline;//显示用户连接列表
-        private static bool Working = true;
+        public static bool Working = true;
         private static Dictionary<string, Socket> dict = new Dictionary<string, Socket>();
         private static Dictionary<string, ClientFiles> clientFiles = new Dictionary<string, ClientFiles>();
         public class ClientFiles
