@@ -18,7 +18,7 @@ namespace Server
         private static Socket socketWatch = null;
         //private static ListBox lstbxMsgView;//显示接受的文件等信息
         //private static ListBox listbOnline;//显示用户连接列表
-        private static bool Working = true;
+        public static bool Working = true;
         private static Dictionary<string, Socket> dict = new Dictionary<string, Socket>();
         private static Dictionary<string, ClientFiles> clientFiles = new Dictionary<string, ClientFiles>();
         public class ClientFiles
@@ -64,7 +64,7 @@ namespace Server
         /// </summary>
         private static void WatchConnecting()
         {
-            while (true&&Working)//持续不断的监听客户端的请求
+            while (Working)//持续不断的监听客户端的请求
             {
                 //开始监听 客户端连接请求，注意：Accept方法，会阻断当前的线程
                 Socket connection = socketWatch.Accept();
@@ -149,9 +149,16 @@ namespace Server
 
                         long fileLen = 0;
 
+                        int recvCount = 0;
 
-                        while (clientFiles[socketStr].filesName.Count < clientFiles[socketStr].FilesCount && (size = socketClient.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
+                        while (clientFiles[socketStr].filesName.Count < clientFiles[socketStr].FilesCount && (size += socketClient.Receive(buffer, size, buffer.Length-size, SocketFlags.None)) > 0)
                         {
+                            if (size < Setting.MaxBuffLength)
+                                continue;
+                            recvCount++;
+                            if (size!= Setting.MaxBuffLength)
+                                Console.WriteLine("Size not right:" + size+"  recv count:"+recvCount);
+
                             if (Mode == 0) Key = ClientPacketId.DataWithFileName;
                             else if (Mode == 1)
                             {
@@ -172,12 +179,13 @@ namespace Server
                                     using (Stream stream = new MemoryStream(buffer))
                                     using (BinaryReader br = new BinaryReader(stream))
                                     {
+                                        Console.WriteLine("Curent thread:"+Thread.CurrentThread.ManagedThreadId);
                                         br.ReadByte();
                                         fileName = br.ReadString();
                                         fileEx = br.ReadString();
                                         fileLen = br.ReadInt64();
                                         offset = (int)stream.Position;
-                                        Console.WriteLine("Ready for :" + fileName);
+                                        Console.WriteLine("Ready for :" + fileName+" Expect Length:"+ fileLen);
                                         //if(string.IsNullOrWhiteSpace(fileName))
                                         //foreach (var item in buffer)
                                         //    Console.Write(item);
@@ -188,13 +196,28 @@ namespace Server
                                         if (!Directory.Exists(fileSavePath))
                                             Directory.CreateDirectory(fileSavePath);
                                         fileName = fileSavePath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + fileName + "." + fileEx;
-                                        
+
                                         fs = new FileStream(fileName, FileMode.Create);
                                         Console.WriteLine("Created :" + fileName);
                                         Mode = 1;
                                         fs.Write(buffer, offset, size - offset);
                                         len += size;
+                                        if (size > fileLen)
+                                        {
+                                            //fs.Write(buffer, offset, (int)(fileLen - len));
+
+                                            fs.Close();
+                                            buffer.CopyTo(bufferOld, 0);
+                                            clientFiles[socketStr].filesName.Add(fileName);
+                                            Console.WriteLine("File saved:" + fileName);
+                                            fileName = string.Empty;
+                                            fileEx = string.Empty;
+                                            Mode = 0;
+                                            len = 0;
+                                            fileLen = 0;
+                                        }
                                     }
+                                    else Console.WriteLine("File Name is empty!");
                                     break;
                                 case ClientPacketId.FileEnd:
                                     fs.Write(buffer, offset, (int)(fileLen - len));
@@ -202,7 +225,7 @@ namespace Server
                                     fs.Close();
                                     buffer.CopyTo(bufferOld,0);
                                     clientFiles[socketStr].filesName.Add(fileName);
-                                    Console.WriteLine("File saved:" + fileName);
+                                    Console.WriteLine("File saved:" + fileName+" All read bytes:"+(len+size));
                                     fileName = string.Empty;
                                     fileEx = string.Empty;
                                     Mode = 0;
@@ -212,7 +235,8 @@ namespace Server
                                 default:
                                     break;
                             }
-
+                            size = 0;
+                            
                         }
                         DateTime oTimeEnd = DateTime.Now;
                         TimeSpan oTime = oTimeEnd.Subtract(oTimeBegin);

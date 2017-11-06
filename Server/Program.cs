@@ -14,7 +14,18 @@ namespace Server
         {
             ReceiveFiles.BeginListening(Setting.IP, Setting.Port);
             Console.WriteLine("Input Q to quit.");
-            Console.ReadKey();
+            ConsoleKeyInfo consoleKeyInfo;
+            while (!(consoleKeyInfo=Console.ReadKey()).Key.Equals(ConsoleKey.Escape))
+            {
+                switch (consoleKeyInfo.Key)
+                {
+                    case ConsoleKey.C:
+                        Console.Clear();
+                        break;
+                    default:break;
+                }
+            }
+            ReceiveFiles.Working = false;
         }       
     }
 }
